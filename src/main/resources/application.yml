@@ -1,9 +1,9 @@
 server:
-  port: 8100
+  port: 8104
 
 spring:
   application:
-    name: CMS Student Service
+    name: CMS-Student-Service
 
   datasource:
     url: jdbc:mysql://localhost:3306/cms_student
@@ -14,5 +14,13 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto=update: update
+      ddl-auto: update
 
+
+location:
+  uri:
+    baseUrl: http://localhost:8102
+    getLocationById: /api/v1/location/##LOCATION-ID##
+
+jwt:
+  secretKey: secret

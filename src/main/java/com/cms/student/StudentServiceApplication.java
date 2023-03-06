@@ -1,4 +1,4 @@
-package com.sms.student;
+package com.cms.student;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
