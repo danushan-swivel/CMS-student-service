@@ -11,12 +11,15 @@ import com.cms.student.exception.InvalidStudentException;
 import com.cms.student.exception.StudentException;
 import com.cms.student.exception.InvalidLocationException;
 import com.cms.student.service.StudentService;
+import com.cms.student.utills.Constants;
 import com.cms.student.wrapper.ErrorResponseWrapper;
 import com.cms.student.wrapper.ResponseWrapper;
 import com.cms.student.wrapper.SuccessResponseWrapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RequestMapping("api/v1/student")
 @RestController
@@ -28,7 +31,8 @@ public class StudentController {
     }
 
     @PostMapping("")
-    public ResponseEntity<ResponseWrapper> createStudent(@RequestBody StudentRequestDto studentRequestDto) {
+    public ResponseEntity<ResponseWrapper> createStudent(@RequestBody StudentRequestDto studentRequestDto,
+                                                         HttpServletRequest request) {
         try {
             if (!studentRequestDto.isRequiredAvailable()) {
                 var response = new ErrorResponseWrapper(ErrorResponseStatus.MISSING_REQUIRED_FIELDS, null);
@@ -38,7 +42,8 @@ public class StudentController {
                 var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_AGE, null);
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
-            Student student = studentService.createStudent(studentRequestDto);
+            String authToken = request.getHeader(Constants.TOKEN_HEADER);
+            Student student = studentService.createStudent(studentRequestDto, authToken);
             var responseDto = new StudentResponseDto(student);
             var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.STUDENT_CREATED, responseDto);
             return new ResponseEntity<>(successResponse, HttpStatus.OK);
@@ -65,7 +70,8 @@ public class StudentController {
     }
 
     @PutMapping("")
-    public ResponseEntity<ResponseWrapper> updateStudent(@RequestBody UpdateStudentRequestDto updateStudentRequestDto) {
+    public ResponseEntity<ResponseWrapper> updateStudent(@RequestBody UpdateStudentRequestDto updateStudentRequestDto,
+                                                         HttpServletRequest request) {
         try {
             if (!updateStudentRequestDto.isRequiredAvailable()) {
                 var response = new ErrorResponseWrapper(ErrorResponseStatus.MISSING_REQUIRED_FIELDS, null);
@@ -75,7 +81,8 @@ public class StudentController {
                 var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_AGE, null);
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
-            Student student = studentService.updateStudent(updateStudentRequestDto);
+            String authToken = request.getHeader(Constants.TOKEN_HEADER);
+            Student student = studentService.updateStudent(updateStudentRequestDto, authToken);
             var responseDto = new StudentResponseDto(student);
             var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.STUDENT_UPDATES, responseDto);
             return new ResponseEntity<>(successResponse, HttpStatus.OK);

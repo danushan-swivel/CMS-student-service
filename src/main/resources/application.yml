@@ -19,7 +19,7 @@ spring:
 
 location:
   uri:
-    baseUrl: http://localhost:8102
+    baseUrl: http://localhost:8105
     getLocationById: /api/v1/location/##LOCATION-ID##
 
 jwt:

@@ -19,7 +19,7 @@ public class StudentResponseDto extends ResponseDto{
     private StudentStatus studentStatus;
     private LocationResponseDto location;
     private long joinedDate;
-    private long lastUpdated;
+    private long updatedAt;
     private boolean isDeleted;
 
     public StudentResponseDto(Student student) {
@@ -34,7 +34,7 @@ public class StudentResponseDto extends ResponseDto{
         this.studentStatus = student.getStudentStatus();
         this.location = null;
         this.joinedDate = student.getUpdatedAt();
-        this.lastUpdated = student.getUpdatedAt();
+        this.updatedAt = student.getUpdatedAt();
         this.isDeleted = student.isDeleted();
     }
 }

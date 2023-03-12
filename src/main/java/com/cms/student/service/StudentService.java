@@ -4,12 +4,12 @@ import com.cms.student.domain.entity.Student;
 import com.cms.student.domain.request.StudentRequestDto;
 import com.cms.student.domain.request.UpdateStudentRequestDto;
 import com.cms.student.exception.ConnectionException;
-import com.cms.student.exception.StudentException;
 import com.cms.student.exception.InvalidLocationException;
 import com.cms.student.exception.InvalidStudentException;
+import com.cms.student.exception.StudentException;
 import com.cms.student.repository.StudentRepository;
+import com.cms.student.utills.Constants;
 import com.cms.student.wrapper.LocationResponseWrapper;
-import com.cms.student.wrapper.ResponseWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
@@ -30,10 +30,10 @@ import org.springframework.web.client.RestTemplate;
 public class StudentService {
     private static final int PAGE = 0;
     private static final int SIZE = 10;
-    private final StudentRepository studentRepository;
-    private final RestTemplate restTemplate;
     private static final String DEFAULT_SORT = "updated_at";
     private static final String LOCATION_ID_REPLACE_PHRASE = "##LOCATION-ID##";
+    private final StudentRepository studentRepository;
+    private final RestTemplate restTemplate;
     private final String getLocationUrl;
 
     @Autowired
@@ -45,15 +45,16 @@ public class StudentService {
         this.getLocationUrl = baseUrl + getLocation;
     }
 
-    public Student createStudent(StudentRequestDto studentRequestDto) {
+    public Student createStudent(StudentRequestDto studentRequestDto, String authToken) {
         try {
             Student student = new Student(studentRequestDto);
             var header = new HttpHeaders();
+            header.set(Constants.TOKEN_HEADER, authToken.trim());
             var entity = new HttpEntity<String>(header);
             String uri = getLocationUrl.replace(LOCATION_ID_REPLACE_PHRASE, studentRequestDto.getLocationId());
             var responseWrapper = restTemplate.exchange(uri, HttpMethod.GET,
                     entity, LocationResponseWrapper.class);
-            if (responseWrapper.getBody().getData() != null) {
+            if (responseWrapper.getBody().getData() == null) {
                 throw new InvalidLocationException("The selected location id not exists. Id : "
                         + studentRequestDto.getLocationId());
             }
@@ -92,10 +93,11 @@ public class StudentService {
         }
     }
 
-    public Student updateStudent(UpdateStudentRequestDto updateStudentRequestDto) {
+    public Student updateStudent(UpdateStudentRequestDto updateStudentRequestDto, String authToken) {
         try {
             Student studentFromDB = getStudentById(updateStudentRequestDto.getStudentId());
             var header = new HttpHeaders();
+            header.set(Constants.TOKEN_HEADER, authToken.trim());
             var entity = new HttpEntity<String>(header);
             String uri = getLocationUrl.replace(LOCATION_ID_REPLACE_PHRASE, updateStudentRequestDto.getLocationId());
             var responseWrapper = restTemplate.exchange(uri, HttpMethod.GET,
@@ -113,7 +115,7 @@ public class StudentService {
                         + updateStudentRequestDto.getLocationId());
             }
             throw new StudentException("The rest template failed", e);
-        }catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new StudentException("Updating student to database is failed", e);
         }
     }

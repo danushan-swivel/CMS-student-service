@@ -7,10 +7,10 @@ public class StudentRequestDto extends RequestDto{
     private String firstName;
     private String lastName;
     private String address;
-    private String gender;
-    private int age;
+    private String gender; //Drop d
+    private int age; //calender
     private int phoneNumber;
-    private String locationId;
+    private String locationId; // dropdowm
 
     @Override
     public boolean isRequiredAvailable() {
