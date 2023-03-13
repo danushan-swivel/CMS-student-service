@@ -10,12 +10,13 @@ public class StudentRequestDto extends RequestDto{
     private String gender; //Drop d
     private int age; //calender
     private int phoneNumber;
+    private int grade;
     private String locationId; // dropdowm
 
     @Override
     public boolean isRequiredAvailable() {
         return isNonEmpty(firstName) && isNonEmpty(lastName) && isNonEmpty(address) && isNonEmpty(gender)
-                && isNonEmpty(String.valueOf(age)) && isNonEmpty(String.valueOf(phoneNumber)) && isNonEmpty(locationId);
+                && isNonEmpty(String.valueOf(age)) && isNonEmpty(String.valueOf(grade)) && isNonEmpty(String.valueOf(phoneNumber)) && isNonEmpty(locationId);
     }
 
     public boolean validAge() {

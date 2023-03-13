@@ -29,6 +29,7 @@ public class Student {
     private Gender gender;
     private int age;
     private int phoneNumber;
+    private int grade;
     @Enumerated(EnumType.STRING)
     private StudentStatus studentStatus;
     private String locationId;
@@ -43,8 +44,9 @@ public class Student {
         this.address = studentRequestDto.getAddress();
         this.gender = Gender.valueOf(studentRequestDto.getGender().toUpperCase());
         this.age = studentRequestDto.getAge();
+        this.grade = studentRequestDto.getGrade();
         this.phoneNumber = studentRequestDto.getPhoneNumber();
-        this.studentStatus = StudentStatus.COMING;
+        this.studentStatus = StudentStatus.valueOf(StudentStatus.COMING.name());
         this.locationId = studentRequestDto.getLocationId();
         this.joinedDate = this.updatedAt = System.currentTimeMillis();
         this.isDeleted = false;
@@ -54,7 +56,7 @@ public class Student {
         this.firstName = updateStudentRequestDto.getFirstName();
         this.lastName = updateStudentRequestDto.getLastName();
         this.address = updateStudentRequestDto.getAddress();
-        this.gender = Gender.valueOf(updateStudentRequestDto.getGender().toUpperCase());
+        this.gender = Gender.valueOf(updateStudentRequestDto.getGender());
         this.age = updateStudentRequestDto.getAge();
         this.phoneNumber = updateStudentRequestDto.getPhoneNumber();
         this.locationId = updateStudentRequestDto.getLocationId();

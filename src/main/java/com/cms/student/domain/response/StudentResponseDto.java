@@ -15,9 +15,10 @@ public class StudentResponseDto extends ResponseDto{
     private String address;
     private Gender gender;
     private int age;
+    private int grade;
     private int phoneNumber;
     private StudentStatus studentStatus;
-    private LocationResponseDto location;
+    private String locationId;
     private long joinedDate;
     private long updatedAt;
     private boolean isDeleted;
@@ -29,10 +30,10 @@ public class StudentResponseDto extends ResponseDto{
         this.address = student.getAddress();
         this.gender = student.getGender();
         this.age = student.getAge();
-        this.age = student.getAge();
+        this.grade = student.getGrade();
         this.phoneNumber = student.getPhoneNumber();
         this.studentStatus = student.getStudentStatus();
-        this.location = null;
+        this.locationId = student.getLocationId();
         this.joinedDate = student.getUpdatedAt();
         this.updatedAt = student.getUpdatedAt();
         this.isDeleted = student.isDeleted();
