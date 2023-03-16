@@ -7,9 +7,7 @@ import com.cms.student.domain.response.StudentListResponseDto;
 import com.cms.student.domain.response.StudentResponseDto;
 import com.cms.student.enums.ErrorResponseStatus;
 import com.cms.student.enums.SuccessResponseStatus;
-import com.cms.student.exception.InvalidStudentException;
-import com.cms.student.exception.StudentException;
-import com.cms.student.exception.InvalidLocationException;
+import com.cms.student.exception.*;
 import com.cms.student.service.StudentService;
 import com.cms.student.utills.Constants;
 import com.cms.student.wrapper.ErrorResponseWrapper;
@@ -47,8 +45,14 @@ public class StudentController {
             var responseDto = new StudentResponseDto(student);
             var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.STUDENT_CREATED, responseDto);
             return new ResponseEntity<>(successResponse, HttpStatus.OK);
+        } catch (StudentAlreadyExistsException e) {
+            var response = new ErrorResponseWrapper(ErrorResponseStatus.STUDENT_ALREADY_EXISTS, null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (InvalidLocationException e) {
             var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_LOCATION, null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (ConnectionException e) {
+            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTER_CONNECTION_FAILED, null);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (StudentException e) {
             var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
@@ -86,8 +90,14 @@ public class StudentController {
             var responseDto = new StudentResponseDto(student);
             var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.STUDENT_UPDATES, responseDto);
             return new ResponseEntity<>(successResponse, HttpStatus.OK);
+        } catch (StudentAlreadyExistsException e) {
+            var response = new ErrorResponseWrapper(ErrorResponseStatus.STUDENT_ALREADY_EXISTS, null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (InvalidLocationException e) {
             var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_LOCATION, null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (ConnectionException e) {
+            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTER_CONNECTION_FAILED, null);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (StudentException e) {
             var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);

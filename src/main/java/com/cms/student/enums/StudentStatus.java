@@ -1,7 +1,6 @@
 package com.cms.student.enums;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public enum StudentStatus {
@@ -9,9 +8,9 @@ public enum StudentStatus {
     STOPPED("Stopped"),
     SUSPENDED("Suspended");
 
-    private final String studentStatus;
+    private final String status;
 
-    StudentStatus(String studentStatus) {
-        this.studentStatus = studentStatus;
+    StudentStatus(String status) {
+        this.status = status;
     }
 }

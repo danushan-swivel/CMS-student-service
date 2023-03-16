@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.sql.Date;
 import java.util.UUID;
 
 @Getter
@@ -32,9 +33,9 @@ public class Student {
     private int grade;
     @Enumerated(EnumType.STRING)
     private StudentStatus studentStatus;
-    private String locationId;
-    private long joinedDate;
-    private long updatedAt;
+    private String tuitionClassId;
+    private Date joinedDate;
+    private Date updatedAt;
     private boolean isDeleted;
 
     public Student (StudentRequestDto studentRequestDto) {
@@ -47,8 +48,8 @@ public class Student {
         this.grade = studentRequestDto.getGrade();
         this.phoneNumber = studentRequestDto.getPhoneNumber();
         this.studentStatus = StudentStatus.valueOf(StudentStatus.COMING.name());
-        this.locationId = studentRequestDto.getLocationId();
-        this.joinedDate = this.updatedAt = System.currentTimeMillis();
+        this.tuitionClassId = studentRequestDto.getTuitionClassId();
+        this.joinedDate = this.updatedAt = new Date(System.currentTimeMillis());
         this.isDeleted = false;
     }
 
@@ -56,10 +57,10 @@ public class Student {
         this.firstName = updateStudentRequestDto.getFirstName();
         this.lastName = updateStudentRequestDto.getLastName();
         this.address = updateStudentRequestDto.getAddress();
-        this.gender = Gender.valueOf(updateStudentRequestDto.getGender());
+        this.gender = Gender.valueOf(updateStudentRequestDto.getGender().toUpperCase());
         this.age = updateStudentRequestDto.getAge();
         this.phoneNumber = updateStudentRequestDto.getPhoneNumber();
-        this.locationId = updateStudentRequestDto.getLocationId();
-        this.updatedAt = System.currentTimeMillis();
+        this.tuitionClassId = updateStudentRequestDto.getTuitionClassId();
+        this.updatedAt = new Date(System.currentTimeMillis());
     }
 }

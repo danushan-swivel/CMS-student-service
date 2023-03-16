@@ -8,16 +8,17 @@ public class UpdateStudentRequestDto extends RequestDto{
     private String firstName;
     private String lastName;
     private String address;
+    private String studentStatus;
     private String gender;
     private int age;
     private int phoneNumber;
-    private String locationId;
+    private String tuitionClassId;
 
     @Override
     public boolean isRequiredAvailable() {
         return isNonEmpty(firstName) && isNonEmpty(lastName) && isNonEmpty(address) && isNonEmpty(gender)
                 && isNonEmpty(String.valueOf(age)) && isNonEmpty(String.valueOf(phoneNumber)) && isNonEmpty(studentId)
-                && isNonEmpty(locationId);
+                && isNonEmpty(tuitionClassId) && isNonEmpty(studentStatus);
     }
 
     public boolean validAge() {
