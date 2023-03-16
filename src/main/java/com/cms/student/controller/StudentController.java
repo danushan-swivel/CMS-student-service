@@ -13,6 +13,7 @@ import com.cms.student.utills.Constants;
 import com.cms.student.wrapper.ErrorResponseWrapper;
 import com.cms.student.wrapper.ResponseWrapper;
 import com.cms.student.wrapper.SuccessResponseWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 public class StudentController {
     private final StudentService studentService;
 
+    @Autowired
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
@@ -90,6 +92,9 @@ public class StudentController {
             var responseDto = new StudentResponseDto(student);
             var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.STUDENT_UPDATES, responseDto);
             return new ResponseEntity<>(successResponse, HttpStatus.OK);
+        } catch (InvalidStudentException e) {
+            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_STUDENT, null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (StudentAlreadyExistsException e) {
             var response = new ErrorResponseWrapper(ErrorResponseStatus.STUDENT_ALREADY_EXISTS, null);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -105,28 +110,15 @@ public class StudentController {
         }
     }
 
-    @GetMapping("/{studentId}")
-    public ResponseEntity<ResponseWrapper> getStudentById(@PathVariable String studentId) {
-        try {
-            var student = studentService.getStudentById(studentId);
-            var responseDto = new StudentResponseDto(student);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.READ_STUDENT, responseDto);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (InvalidStudentException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_STUDENT, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (StudentException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @DeleteMapping("/{studentId}")
     public ResponseEntity<ResponseWrapper> deleteStudent(@PathVariable String studentId) {
         try {
             studentService.deleteStudent(studentId);
             var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.STUDENT_DELETED, null);
             return new ResponseEntity<>(successResponse, HttpStatus.OK);
+        } catch (InvalidStudentException e) {
+            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_STUDENT, null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (StudentException e) {
             var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,7 +1,9 @@
 package com.cms.student.domain.request;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 public class StudentRequestDto extends RequestDto{
     private String firstName;

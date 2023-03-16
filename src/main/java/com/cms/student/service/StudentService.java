@@ -3,10 +3,7 @@ package com.cms.student.service;
 import com.cms.student.domain.entity.Student;
 import com.cms.student.domain.request.StudentRequestDto;
 import com.cms.student.domain.request.UpdateStudentRequestDto;
-import com.cms.student.exception.ConnectionException;
-import com.cms.student.exception.InvalidLocationException;
-import com.cms.student.exception.InvalidStudentException;
-import com.cms.student.exception.StudentException;
+import com.cms.student.exception.*;
 import com.cms.student.repository.StudentRepository;
 import com.cms.student.utills.Constants;
 import com.cms.student.wrapper.LocationResponseWrapper;
@@ -20,18 +17,21 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Date;
+import java.util.Objects;
+
 @Service
 public class StudentService {
     private static final int PAGE = 0;
-    private static final int SIZE = 10;
+    private static final int SIZE = 100;
     private static final String DEFAULT_SORT = "updated_at";
     private static final String LOCATION_ID_REPLACE_PHRASE = "##LOCATION-ID##";
+    private static final String INVALID_TUITION_CLASS_EXCEPTION_MESSAGE = "The selected location id not exists. Id : ";
     private final StudentRepository studentRepository;
     private final RestTemplate restTemplate;
     private final String getLocationUrl;
@@ -48,25 +48,25 @@ public class StudentService {
     public Student createStudent(StudentRequestDto studentRequestDto, String authToken) {
         try {
             Student student = new Student(studentRequestDto);
+            if (checkStudentExistence(studentRequestDto.getFirstName(), studentRequestDto.getLastName(), null)) {
+                throw new StudentAlreadyExistsException("Student already exists");
+            }
             var header = new HttpHeaders();
             header.set(Constants.TOKEN_HEADER, authToken.trim());
             var entity = new HttpEntity<String>(header);
-            String uri = getLocationUrl.replace(LOCATION_ID_REPLACE_PHRASE, studentRequestDto.getLocationId());
+            String uri = getLocationUrl.replace(LOCATION_ID_REPLACE_PHRASE, studentRequestDto.getTuitionClassId());
             var responseWrapper = restTemplate.exchange(uri, HttpMethod.GET,
                     entity, LocationResponseWrapper.class);
-            if (responseWrapper.getBody().getData() == null) {
-                throw new InvalidLocationException("The selected location id not exists. Id : "
-                        + studentRequestDto.getLocationId());
+            var statusCode = Objects.requireNonNull(responseWrapper.getBody()).getStatusCode();
+            if (statusCode != 2032) {
+                throw new InvalidLocationException(INVALID_TUITION_CLASS_EXCEPTION_MESSAGE
+                        + studentRequestDto.getTuitionClassId());
             }
             return studentRepository.save(student);
         } catch (ResourceAccessException e) {
             throw new ConnectionException("Can not access the resources from other services", e);
         } catch (HttpClientErrorException e) {
-            if (e.getRawStatusCode() == HttpStatus.BAD_REQUEST.value()) {
-                throw new InvalidLocationException("The selected location id not exists. Id : "
-                        + studentRequestDto.getLocationId());
-            }
-            throw new StudentException("The rest template failed", e);
+            throw new StudentException("Getting tuition class by id is failed", e);
         } catch (DataAccessException e) {
             throw new StudentException("Saving student into database is failed", e);
         }
@@ -96,25 +96,28 @@ public class StudentService {
     public Student updateStudent(UpdateStudentRequestDto updateStudentRequestDto, String authToken) {
         try {
             Student studentFromDB = getStudentById(updateStudentRequestDto.getStudentId());
+            if (checkStudentExistence(updateStudentRequestDto.getFirstName(), updateStudentRequestDto.getLastName(),
+                    updateStudentRequestDto.getStudentId())) {
+                throw new StudentAlreadyExistsException("Student already exists");
+            }
             var header = new HttpHeaders();
             header.set(Constants.TOKEN_HEADER, authToken.trim());
             var entity = new HttpEntity<String>(header);
-            String uri = getLocationUrl.replace(LOCATION_ID_REPLACE_PHRASE, updateStudentRequestDto.getLocationId());
+            String uri = getLocationUrl.replace(LOCATION_ID_REPLACE_PHRASE, updateStudentRequestDto.getTuitionClassId());
             var responseWrapper = restTemplate.exchange(uri, HttpMethod.GET,
                     entity, LocationResponseWrapper.class);
-            if (responseWrapper.getBody().getData() == null) {
-                throw new InvalidLocationException("The selected location id not exists. Id : "
-                        + updateStudentRequestDto.getLocationId());
+            var statusCode = Objects.requireNonNull(responseWrapper.getBody()).getStatusCode();
+            if (statusCode != 2032) {
+                throw new InvalidLocationException(INVALID_TUITION_CLASS_EXCEPTION_MESSAGE
+                        + updateStudentRequestDto.getTuitionClassId());
             }
             studentFromDB.update(updateStudentRequestDto);
             studentRepository.save(studentFromDB);
             return studentFromDB;
+        } catch (ResourceAccessException e) {
+            throw new ConnectionException("Can not access the resources from other services", e);
         } catch (HttpClientErrorException e) {
-            if (e.getRawStatusCode() == HttpStatus.BAD_REQUEST.value()) {
-                throw new InvalidLocationException("The selected location id not exists. Id : "
-                        + updateStudentRequestDto.getLocationId());
-            }
-            throw new StudentException("The rest template failed", e);
+            throw new StudentException("Getting tuition class by id is failed", e);
         } catch (DataAccessException e) {
             throw new StudentException("Updating student to database is failed", e);
         }
@@ -124,10 +127,22 @@ public class StudentService {
         try {
             Student studentFromDB = getStudentById(studentId);
             studentFromDB.setDeleted(true);
-            studentFromDB.setUpdatedAt(System.currentTimeMillis());
+            studentFromDB.setUpdatedAt(new Date(System.currentTimeMillis()));
             studentRepository.save(studentFromDB);
         } catch (DataAccessException e) {
             throw new StudentException("Deleting student is failed", e);
+        }
+    }
+
+    private boolean checkStudentExistence(String firstName, String lastName, String studentId) {
+        try {
+            if (studentId == null) {
+                return studentRepository.existsByFirstNameAndLastName(firstName, lastName);
+            } else {
+                return studentRepository.existsByFirstNameAndLastNameAndStudentId(firstName, lastName, studentId);
+            }
+        } catch (DataAccessException e) {
+            throw new StudentException("Checking the student record in database is failed");
         }
     }
 }
