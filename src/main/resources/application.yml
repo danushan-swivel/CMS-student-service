@@ -1,18 +1,35 @@
 server:
-  port: 8100
+  port: 8104
 
 spring:
   application:
-    name: CMS Student Service
+    name: CMS-Student-Service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/cms_student
-    username: root
-    password: Dev@#$123
+    url: jdbc:mysql://b07da724040dd7:94fcc9f7@us-cdbr-east-06.cleardb.net/heroku_1e995eee500727d?reconnect=true
+#    username: root
+#    password: Dev@#$123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto=update: update
+      ddl-auto: update
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: https://cms-discovery.herokuapp.com/eureka
+  instance:
+    preferIpAddress: true
+
+
+
+location:
+  uri:
+#    baseUrl: http://localhost:8105
+    baseUrl: https://cms-location.herokuapp.com
+    getLocationById: /api/v1/tuition/##LOCATION-ID##
+
+jwt:
+  secretKey: secret
