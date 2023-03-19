@@ -180,7 +180,7 @@ public class StudentService {
             if (studentId == null) {
                 return studentRepository.existsByFirstNameAndLastName(firstName, lastName);
             } else {
-                return studentRepository.existsByFirstNameAndLastNameAndStudentId(firstName, lastName, studentId);
+                return studentRepository.existsByFirstNameAndLastNameAndStudentIdNot(firstName, lastName, studentId);
             }
         } catch (DataAccessException e) {
             throw new StudentException("Checking the student record in database is failed");
