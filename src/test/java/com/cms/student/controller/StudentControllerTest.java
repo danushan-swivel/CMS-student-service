@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class StudentControllerTest {
     private static final String STUDENT_BASE_URL = "/api/v1/student";
-    private static final String DELETE_STUDENT_URL = "/api/v1/student/##STUDENT-ID##";
+    private static final String STUDENT_BY_ID_URL = "/api/v1/student/##STUDENT-ID##";
     private static final String STUDENT_ID = "sid-1254-7854-6485";
     private static final String ACCESS_TOKEN = "ey1365651-14156-51";
     private static final String FIRST_NAME = "Danushan";
@@ -48,9 +48,6 @@ class StudentControllerTest {
     private static final int PHONE_NUMBER = 771109101;
     private static final int AGE = 27;
     private static final int GRADE = 12;
-    private static final int PAGE = 0;
-    private static final int SIZE = 100;
-    private static final String DEFAULT_SORT = "updated_at";
 
     @Mock
     private StudentService studentService;
@@ -165,6 +162,49 @@ class StudentControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(STUDENT_BASE_URL)
                         .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
                         .content(studentRequestDto.toJson())
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getStatusCode()))
+                .andExpect(jsonPath("$.data", nullValue()));
+    }
+
+    @Test
+    void Should_ReturnOk_When_GetStudentSuccessfully() throws Exception {
+        String url = STUDENT_BY_ID_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
+        Student student = getSampleStudent();
+        when(studentService.getStudentById(STUDENT_ID)).thenReturn(student);
+        mockMvc.perform(MockMvcRequestBuilders.get(url)
+                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message").value(SuccessResponseStatus.READ_STUDENT.getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(SuccessResponseStatus.READ_STUDENT.getStatusCode()))
+                .andExpect(jsonPath("$.data.studentId", startsWith("sid-")));
+    }
+
+    @Test
+    void Should_ReturnBadRequest_When_InvalidStudentIdIsProvided() throws Exception {
+        String url = STUDENT_BY_ID_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
+        doThrow(new InvalidStudentException("ERROR")).when(studentService).getStudentById(STUDENT_ID);
+        mockMvc.perform(MockMvcRequestBuilders.get(url)
+                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_STUDENT.getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_STUDENT.getStatusCode()))
+                .andExpect(jsonPath("$.data", nullValue()));
+    }
+
+    @Test
+    void Should_ReturnInternalServerError_When_GetStudentByIdIsFailed() throws Exception {
+        String url = STUDENT_BY_ID_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
+        doThrow(new StudentException("ERROR")).when(studentService).getStudentById(STUDENT_ID);
+        mockMvc.perform(MockMvcRequestBuilders.get(url)
+                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType("application/json"))
@@ -327,7 +367,7 @@ class StudentControllerTest {
     @Test
     void Should_ReturnOk_When_StudentIsDeletedSuccessfully() throws Exception {
         doNothing().when(studentService).deleteStudent(STUDENT_ID);
-        String url = DELETE_STUDENT_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
+        String url = STUDENT_BY_ID_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
         mockMvc.perform(MockMvcRequestBuilders.delete(url)
                         .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
@@ -341,7 +381,7 @@ class StudentControllerTest {
     @Test
     void Should_ReturnBadRequest_When_InvalidStudentIdIsProvidedForDeleteStudent() throws Exception {
         doThrow(new InvalidStudentException("ERROR")).when(studentService).deleteStudent(STUDENT_ID);
-        String url = DELETE_STUDENT_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
+        String url = STUDENT_BY_ID_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
         mockMvc.perform(MockMvcRequestBuilders.delete(url)
                         .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
@@ -355,7 +395,7 @@ class StudentControllerTest {
     @Test
     void Should_ReturnBadRequest_When_DeleteStudentIsFailed() throws Exception {
         doThrow(new StudentException("ERROR")).when(studentService).deleteStudent(STUDENT_ID);
-        String url = DELETE_STUDENT_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
+        String url = STUDENT_BY_ID_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
         mockMvc.perform(MockMvcRequestBuilders.delete(url)
                         .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))

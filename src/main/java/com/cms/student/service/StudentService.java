@@ -25,6 +25,9 @@ import org.springframework.web.client.RestTemplate;
 import java.sql.Date;
 import java.util.Objects;
 
+/**
+ * Student Service
+ */
 @Service
 public class StudentService {
     private static final int PAGE = 0;
@@ -45,6 +48,13 @@ public class StudentService {
         this.getLocationUrl = baseUrl + getLocation;
     }
 
+    /**
+     * This method create new student
+     *
+     * @param studentRequestDto student request dto
+     * @param authToken         access token
+     * @return Student
+     */
     public Student createStudent(StudentRequestDto studentRequestDto, String authToken) {
         try {
             Student student = new Student(studentRequestDto);
@@ -72,6 +82,12 @@ public class StudentService {
         }
     }
 
+    /**
+     * This method get student by id
+     *
+     * @param studentId student id
+     * @return Student
+     */
     public Student getStudentById(String studentId) {
         try {
             var optionalStudent = studentRepository.findById(studentId);
@@ -84,6 +100,11 @@ public class StudentService {
         }
     }
 
+    /**
+     * This method get student page
+     *
+     * @return StudentPage
+     */
     public Page<Student> getStudentsPage() {
         try {
             Pageable pageable = PageRequest.of(PAGE, SIZE, Sort.by(DEFAULT_SORT).ascending());
@@ -93,6 +114,13 @@ public class StudentService {
         }
     }
 
+    /**
+     * This method existing update student
+     *
+     * @param updateStudentRequestDto update student request dto
+     * @param authToken               access token
+     * @return Student
+     */
     public Student updateStudent(UpdateStudentRequestDto updateStudentRequestDto, String authToken) {
         try {
             Student studentFromDB = getStudentById(updateStudentRequestDto.getStudentId());
@@ -123,6 +151,11 @@ public class StudentService {
         }
     }
 
+    /**
+     * This method delete the student
+     *
+     * @param studentId student id
+     */
     public void deleteStudent(String studentId) {
         try {
             Student studentFromDB = getStudentById(studentId);
@@ -134,6 +167,14 @@ public class StudentService {
         }
     }
 
+    /**
+     * This method check existence of the student
+     *
+     * @param firstName first name
+     * @param lastName  last name
+     * @param studentId student id
+     * @return true/ false
+     */
     private boolean checkStudentExistence(String firstName, String lastName, String studentId) {
         try {
             if (studentId == null) {

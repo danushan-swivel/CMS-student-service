@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 public class WebSecurityConfiguration {
     private final String key;
 
-    public WebSecurityConfiguration(@Value("${security.key}")String key) {
+    public WebSecurityConfiguration(@Value("${security.key}") String key) {
         this.key = key;
     }
 
@@ -22,9 +22,7 @@ public class WebSecurityConfiguration {
         http.addFilterBefore(new JwtValidator(key), BasicAuthenticationFilter.class)
                 .csrf().disable()
                 .authorizeRequests(
-                        authorize -> {
-                            authorize.anyRequest().authenticated();
-                        }
+                        authorize -> authorize.anyRequest().authenticated()
                 ).formLogin().and()
                 .httpBasic();
         return http.build();
