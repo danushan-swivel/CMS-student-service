@@ -1,5 +1,7 @@
 server:
   port: 8104
+  servlet:
+    context-path: /student
 
 spring:
   application:
@@ -28,8 +30,8 @@ eureka:
 location:
   uri:
 #    baseUrl: http://localhost:8105
-    baseUrl: https://cms-location.herokuapp.com
-    getLocationById: /api/v1/tuition/##LOCATION-ID##
+    baseUrl: https://cms-tuition-class.herokuapp.com
+    getLocationById: /tuition/api/v1/tuition/##LOCATION-ID##
 
-jwt:
-  secretKey: secret
+security:
+  key: accessKey

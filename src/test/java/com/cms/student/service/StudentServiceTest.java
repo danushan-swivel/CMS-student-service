@@ -214,7 +214,7 @@ class StudentServiceTest {
         UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
         LocationResponseWrapper locationResponseWrapper = getSampleLocationResponseWrapper();
         when(studentRepository.findById(STUDENT_ID)).thenReturn(Optional.of(student));
-        when(studentRepository.existsByFirstNameAndLastNameAndStudentId(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
+        when(studentRepository.existsByFirstNameAndLastNameAndStudentIdNot(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
                 .thenReturn(false);
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 eq(LocationResponseWrapper.class))).thenReturn(ResponseEntity.of(Optional.of(locationResponseWrapper)));
@@ -227,7 +227,7 @@ class StudentServiceTest {
         UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
         Student student = getSampleStudent();
         when(studentRepository.findById(STUDENT_ID)).thenReturn(Optional.of(student));
-        when(studentRepository.existsByFirstNameAndLastNameAndStudentId(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
+        when(studentRepository.existsByFirstNameAndLastNameAndStudentIdNot(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
                 .thenReturn(true);
         StudentAlreadyExistsException exception = assertThrows(StudentAlreadyExistsException.class, () ->
                 studentService.updateStudent(updateStudentRequestDto, ACCESS_TOKEN));
@@ -242,7 +242,7 @@ class StudentServiceTest {
         locationResponseWrapper.setData(null);
         Student student = getSampleStudent();
         when(studentRepository.findById(STUDENT_ID)).thenReturn(Optional.of(student));
-        when(studentRepository.existsByFirstNameAndLastNameAndStudentId(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
+        when(studentRepository.existsByFirstNameAndLastNameAndStudentIdNot(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
                 .thenReturn(false);
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 eq(LocationResponseWrapper.class))).thenReturn(ResponseEntity.of(Optional.of(locationResponseWrapper)));
@@ -256,7 +256,7 @@ class StudentServiceTest {
         UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
         Student student = getSampleStudent();
         when(studentRepository.findById(STUDENT_ID)).thenReturn(Optional.of(student));
-        when(studentRepository.existsByFirstNameAndLastNameAndStudentId(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
+        when(studentRepository.existsByFirstNameAndLastNameAndStudentIdNot(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
                 .thenReturn(false);
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 eq(LocationResponseWrapper.class))).thenThrow(new ResourceAccessException("Couldn't access the resource"));
@@ -270,7 +270,7 @@ class StudentServiceTest {
         UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
         Student student = getSampleStudent();
         when(studentRepository.findById(STUDENT_ID)).thenReturn(Optional.of(student));
-        when(studentRepository.existsByFirstNameAndLastNameAndStudentId(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
+        when(studentRepository.existsByFirstNameAndLastNameAndStudentIdNot(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
                 .thenReturn(false);
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 eq(LocationResponseWrapper.class))).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
@@ -285,7 +285,7 @@ class StudentServiceTest {
         UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
         LocationResponseWrapper locationResponseWrapper = getSampleLocationResponseWrapper();
         when(studentRepository.findById(STUDENT_ID)).thenReturn(Optional.of(student));
-        when(studentRepository.existsByFirstNameAndLastNameAndStudentId(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
+        when(studentRepository.existsByFirstNameAndLastNameAndStudentIdNot(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
                 .thenReturn(false);
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 eq(LocationResponseWrapper.class))).thenReturn(ResponseEntity.of(Optional.of(locationResponseWrapper)));
@@ -301,7 +301,7 @@ class StudentServiceTest {
         UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
         Student student = getSampleStudent();
         when(studentRepository.findById(STUDENT_ID)).thenReturn(Optional.of(student));
-        when(studentRepository.existsByFirstNameAndLastNameAndStudentId(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
+        when(studentRepository.existsByFirstNameAndLastNameAndStudentIdNot(UPDATED_FIRST_NAME, UPDATED_LAST_NAME, STUDENT_ID))
                 .thenThrow(new DataAccessException("ERROR") {
                 });
         StudentException exception = assertThrows(StudentException.class, () ->

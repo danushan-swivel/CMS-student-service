@@ -62,6 +62,22 @@ public class StudentController {
         }
     }
 
+    @GetMapping("/{studentId}")
+    public ResponseEntity<ResponseWrapper> getStudentById(@PathVariable String studentId) {
+        try {
+            var student = studentService.getStudentById(studentId);
+            var responseDto = new StudentResponseDto(student);
+            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.READ_STUDENT, responseDto);
+            return new ResponseEntity<>(successResponse, HttpStatus.OK);
+        } catch (InvalidStudentException e) {
+            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_STUDENT, null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (StudentException e) {
+            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("")
     public ResponseEntity<ResponseWrapper> getAllStudents() {
         try {

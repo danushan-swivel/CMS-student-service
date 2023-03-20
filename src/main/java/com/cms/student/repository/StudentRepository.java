@@ -17,10 +17,8 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     @Query(value = "SELECT * FROM student d WHERE d.is_deleted=false AND d.student_id=?1", nativeQuery = true)
     Optional<Student> findById(String studentId);
 
-//    @Query(value = "SELECT COUNT(*) FROM student d WHERE d.is_deleted=false AND d.first_name=?1 AND d.last_name=?2", nativeQuery = true)
     boolean existsByFirstNameAndLastName(String firstName, String lastName);
 
-//    @Query(value = "SELECT COUNT(*)>0 FROM student d WHERE d.is_deleted=false AND d.first_name=?1 AND d.last_name=?2 AND d.student_id!=?3", nativeQuery = true)
-    boolean existsByFirstNameAndLastNameAndStudentId(String firstName, String lastName, String studentId);
+    boolean existsByFirstNameAndLastNameAndStudentIdNot(String firstName, String lastName, String studentId);
 
 }
