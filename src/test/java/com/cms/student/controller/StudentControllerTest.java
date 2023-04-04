@@ -135,8 +135,8 @@ class StudentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_LOCATION.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_LOCATION.getStatusCode()))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_TUITION_CLASS_LOCATION.getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_TUITION_CLASS_LOCATION.getStatusCode()))
                 .andExpect(jsonPath("$.data", nullValue()));
     }
 
@@ -329,8 +329,8 @@ class StudentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_LOCATION.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_LOCATION.getStatusCode()))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_TUITION_CLASS_LOCATION.getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_TUITION_CLASS_LOCATION.getStatusCode()))
                 .andExpect(jsonPath("$.data", nullValue()));
     }
 
