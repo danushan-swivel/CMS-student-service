@@ -35,3 +35,9 @@ location:
 
 security:
   key: accessKey
+
+logging:
+  level:
+    com.cms.student: ${LOG_LEVEL:DEBUG}
+  file:
+    path: ${LOGPATH:./log}

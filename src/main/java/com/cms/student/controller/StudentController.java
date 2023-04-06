@@ -7,12 +7,10 @@ import com.cms.student.domain.response.StudentListResponseDto;
 import com.cms.student.domain.response.StudentResponseDto;
 import com.cms.student.enums.ErrorResponseStatus;
 import com.cms.student.enums.SuccessResponseStatus;
-import com.cms.student.exception.*;
 import com.cms.student.service.StudentService;
 import com.cms.student.utills.Constants;
-import com.cms.student.wrapper.ErrorResponseWrapper;
 import com.cms.student.wrapper.ResponseWrapper;
-import com.cms.student.wrapper.SuccessResponseWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 @RequestMapping("api/v1/student")
 @RestController
-public class StudentController {
+public class StudentController extends BaseController {
     private final StudentService studentService;
 
     @Autowired
@@ -33,111 +32,65 @@ public class StudentController {
     @PostMapping("")
     public ResponseEntity<ResponseWrapper> createStudent(@RequestBody StudentRequestDto studentRequestDto,
                                                          HttpServletRequest request) {
-        try {
-            if (!studentRequestDto.isRequiredAvailable()) {
-                var response = new ErrorResponseWrapper(ErrorResponseStatus.MISSING_REQUIRED_FIELDS, null);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-            if (!studentRequestDto.validAge()) {
-                var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_AGE, null);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-            String authToken = request.getHeader(Constants.TOKEN_HEADER);
-            Student student = studentService.createStudent(studentRequestDto, authToken);
-            var responseDto = new StudentResponseDto(student);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.STUDENT_CREATED, responseDto);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (StudentAlreadyExistsException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.STUDENT_ALREADY_EXISTS, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (InvalidLocationException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_LOCATION, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (ConnectionException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTER_CONNECTION_FAILED, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (StudentException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        if (!studentRequestDto.isRequiredAvailable()) {
+            log.debug("The required field values {} are missing for create new student",
+                    studentRequestDto.toJson());
+            return getErrorResponse(ErrorResponseStatus.MISSING_REQUIRED_FIELDS);
         }
+        if (!studentRequestDto.validAge()) {
+            log.debug("The invalid age {} is given to create new student", studentRequestDto.getAge());
+            return getErrorResponse(ErrorResponseStatus.INVALID_AGE);
+        }
+        String authToken = request.getHeader(Constants.TOKEN_HEADER);
+        Student student = studentService.createStudent(studentRequestDto, authToken);
+        var responseDto = new StudentResponseDto(student);
+        log.debug("The new student is created successfully");
+        return getSuccessResponse(SuccessResponseStatus.STUDENT_CREATED, responseDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/{studentId}")
     public ResponseEntity<ResponseWrapper> getStudentById(@PathVariable String studentId) {
-        try {
-            var student = studentService.getStudentById(studentId);
-            var responseDto = new StudentResponseDto(student);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.READ_STUDENT, responseDto);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (InvalidStudentException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_STUDENT, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (StudentException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        var student = studentService.getStudentById(studentId);
+        var responseDto = new StudentResponseDto(student);
+        log.debug("The student is retrieved successfully for student id: {}", studentId);
+        return getSuccessResponse(SuccessResponseStatus.READ_STUDENT, responseDto, HttpStatus.OK);
     }
 
     @GetMapping("")
     public ResponseEntity<ResponseWrapper> getAllStudents() {
-        try {
-            var studentsPage = studentService.getStudentsPage();
-            var responseDto = new StudentListResponseDto(studentsPage);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.READ_STUDENT_LIST, responseDto);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (StudentException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        var studentsPage = studentService.getStudentsPage();
+        var responseDto = new StudentListResponseDto(studentsPage);
+        log.debug("The retrieving all student details is successful");
+        return getSuccessResponse(SuccessResponseStatus.READ_STUDENT_LIST, responseDto, HttpStatus.OK);
     }
 
     @PutMapping("")
     public ResponseEntity<ResponseWrapper> updateStudent(@RequestBody UpdateStudentRequestDto updateStudentRequestDto,
                                                          HttpServletRequest request) {
-        try {
-            if (!updateStudentRequestDto.isRequiredAvailable()) {
-                var response = new ErrorResponseWrapper(ErrorResponseStatus.MISSING_REQUIRED_FIELDS, null);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-            if (!updateStudentRequestDto.validAge()) {
-                var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_AGE, null);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-            String authToken = request.getHeader(Constants.TOKEN_HEADER);
-            Student student = studentService.updateStudent(updateStudentRequestDto, authToken);
-            var responseDto = new StudentResponseDto(student);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.STUDENT_UPDATES, responseDto);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (InvalidStudentException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_STUDENT, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (StudentAlreadyExistsException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.STUDENT_ALREADY_EXISTS, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (InvalidLocationException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_LOCATION, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (ConnectionException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTER_CONNECTION_FAILED, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (StudentException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        if (!updateStudentRequestDto.isRequiredAvailable()) {
+            log.debug("The updating student is failed by required field values {} are missing for student {}",
+                    updateStudentRequestDto.toJson(), updateStudentRequestDto.getStudentId());
+            return getErrorResponse(ErrorResponseStatus.MISSING_REQUIRED_FIELDS);
         }
+        if (!updateStudentRequestDto.validAge()) {
+            log.debug("The invalid age {} is given to update the student: {}", updateStudentRequestDto.getAge(),
+                    updateStudentRequestDto.getStudentId());
+            return getErrorResponse(ErrorResponseStatus.INVALID_AGE);
+        }
+        String authToken = request.getHeader(Constants.TOKEN_HEADER);
+        Student student = studentService.updateStudent(updateStudentRequestDto, authToken);
+        var responseDto = new StudentResponseDto(student);
+        log.debug("The student is updated successfully for student id: {}", updateStudentRequestDto.getStudentId());
+        return getSuccessResponse(SuccessResponseStatus.STUDENT_UPDATES, responseDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{studentId}")
     public ResponseEntity<ResponseWrapper> deleteStudent(@PathVariable String studentId) {
-        try {
-            studentService.deleteStudent(studentId);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.STUDENT_DELETED, null);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (InvalidStudentException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_STUDENT, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (StudentException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        studentService.deleteStudent(studentId);
+        log.debug("The student is deleted successfully for student id: {}", studentId);
+        return getSuccessResponse(SuccessResponseStatus.STUDENT_DELETED, null, HttpStatus.OK);
     }
 }

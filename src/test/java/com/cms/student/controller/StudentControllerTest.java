@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -76,7 +77,7 @@ class StudentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message").value(SuccessResponseStatus.STUDENT_CREATED.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(SuccessResponseStatus.STUDENT_CREATED.getStatusCode()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.CREATED.value()))
                 .andExpect(jsonPath("$.data.studentId", startsWith("sid-")));
     }
 
@@ -91,7 +92,7 @@ class StudentControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message").value(ErrorResponseStatus.MISSING_REQUIRED_FIELDS.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.MISSING_REQUIRED_FIELDS.getStatusCode()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.data", nullValue()));
     }
 
@@ -106,67 +107,7 @@ class StudentControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_AGE.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_AGE.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    @Test
-    void Should_ReturnBadRequest_When_StudentAlreadyExistsForCreateStudent() throws Exception {
-        StudentRequestDto studentRequestDto = getSampleStudentRequestDto();
-        doThrow(new StudentAlreadyExistsException("ERROR")).when(studentService).createStudent(any(StudentRequestDto.class), anyString());
-        mockMvc.perform(MockMvcRequestBuilders.post(STUDENT_BASE_URL)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .content(studentRequestDto.toJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.STUDENT_ALREADY_EXISTS.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.STUDENT_ALREADY_EXISTS.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    @Test
-    void Should_ReturnBadRequest_When_InvalidTuitionClassIdIsProvidedForCreateStudent() throws Exception {
-        StudentRequestDto studentRequestDto = getSampleStudentRequestDto();
-        doThrow(new InvalidLocationException("ERROR")).when(studentService).createStudent(any(StudentRequestDto.class), anyString());
-        mockMvc.perform(MockMvcRequestBuilders.post(STUDENT_BASE_URL)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .content(studentRequestDto.toJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_LOCATION.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_LOCATION.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    @Test
-    void Should_ReturnBadRequest_When_TuitionClassServiceNotAvailableForCreateStudent() throws Exception {
-        StudentRequestDto studentRequestDto = getSampleStudentRequestDto();
-        doThrow(new ConnectionException("ERROR")).when(studentService).createStudent(any(StudentRequestDto.class), anyString());
-        mockMvc.perform(MockMvcRequestBuilders.post(STUDENT_BASE_URL)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .content(studentRequestDto.toJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INTER_CONNECTION_FAILED.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INTER_CONNECTION_FAILED.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    @Test
-    void Should_ReturnInternalServerError_When_CreateStudentIsFailed() throws Exception {
-        StudentRequestDto studentRequestDto = getSampleStudentRequestDto();
-        doThrow(new StudentException("ERROR")).when(studentService).createStudent(any(StudentRequestDto.class), anyString());
-        mockMvc.perform(MockMvcRequestBuilders.post(STUDENT_BASE_URL)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .content(studentRequestDto.toJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getStatusCode()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.data", nullValue()));
     }
 
@@ -181,36 +122,8 @@ class StudentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message").value(SuccessResponseStatus.READ_STUDENT.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(SuccessResponseStatus.READ_STUDENT.getStatusCode()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.data.studentId", startsWith("sid-")));
-    }
-
-    @Test
-    void Should_ReturnBadRequest_When_InvalidStudentIdIsProvided() throws Exception {
-        String url = STUDENT_BY_ID_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
-        doThrow(new InvalidStudentException("ERROR")).when(studentService).getStudentById(STUDENT_ID);
-        mockMvc.perform(MockMvcRequestBuilders.get(url)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_STUDENT.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_STUDENT.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    @Test
-    void Should_ReturnInternalServerError_When_GetStudentByIdIsFailed() throws Exception {
-        String url = STUDENT_BY_ID_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
-        doThrow(new StudentException("ERROR")).when(studentService).getStudentById(STUDENT_ID);
-        mockMvc.perform(MockMvcRequestBuilders.get(url)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
     }
 
     @Test
@@ -223,24 +136,10 @@ class StudentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message").value(SuccessResponseStatus.READ_STUDENT_LIST.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(SuccessResponseStatus.READ_STUDENT_LIST.getStatusCode()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.data.students[0].studentId", startsWith("sid-")));
     }
 
-    @Test
-    void Should_ReturnInternalServerError_When_GetStudentsDetailsIsFailed() throws Exception {
-        doThrow(new StudentException("ERROR")).when(studentService).getStudentsPage();
-        mockMvc.perform(MockMvcRequestBuilders.get(STUDENT_BASE_URL)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    //
     @Test
     void Should_ReturnOk_When_UpdateStudentSuccessfully() throws Exception {
         UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
@@ -255,7 +154,7 @@ class StudentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message").value(SuccessResponseStatus.STUDENT_UPDATES.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(SuccessResponseStatus.STUDENT_UPDATES.getStatusCode()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.data.studentId", startsWith("sid-")));
     }
 
@@ -270,7 +169,7 @@ class StudentControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message").value(ErrorResponseStatus.MISSING_REQUIRED_FIELDS.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.MISSING_REQUIRED_FIELDS.getStatusCode()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.data", nullValue()));
     }
 
@@ -285,84 +184,10 @@ class StudentControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_AGE.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_AGE.getStatusCode()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.data", nullValue()));
     }
 
-    @Test
-    void Should_ReturnBadRequest_When_InvalidStudentIdIsProvidedForUpdateStudent() throws Exception {
-        UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
-        doThrow(new InvalidStudentException("ERROR")).when(studentService).updateStudent(any(UpdateStudentRequestDto.class), anyString());
-        mockMvc.perform(MockMvcRequestBuilders.put(STUDENT_BASE_URL)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .content(updateStudentRequestDto.toJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_STUDENT.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_STUDENT.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    @Test
-    void Should_ReturnBadRequest_When_StudentAlreadyExistsForUpdateStudent() throws Exception {
-        UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
-        doThrow(new StudentAlreadyExistsException("ERROR")).when(studentService).updateStudent(any(UpdateStudentRequestDto.class), anyString());
-        mockMvc.perform(MockMvcRequestBuilders.put(STUDENT_BASE_URL)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .content(updateStudentRequestDto.toJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.STUDENT_ALREADY_EXISTS.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.STUDENT_ALREADY_EXISTS.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    @Test
-    void Should_ReturnBadRequest_When_InvalidTuitionClassIdIsProvidedForUpdateStudent() throws Exception {
-        UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
-        doThrow(new InvalidLocationException("ERROR")).when(studentService).updateStudent(any(UpdateStudentRequestDto.class), anyString());
-        mockMvc.perform(MockMvcRequestBuilders.put(STUDENT_BASE_URL)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .content(updateStudentRequestDto.toJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_LOCATION.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_LOCATION.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    @Test
-    void Should_ReturnBadRequest_When_TuitionClassServiceNotAvailableForUpdateStudent() throws Exception {
-        UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
-        doThrow(new ConnectionException("ERROR")).when(studentService).updateStudent(any(UpdateStudentRequestDto.class), anyString());
-        mockMvc.perform(MockMvcRequestBuilders.put(STUDENT_BASE_URL)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .content(updateStudentRequestDto.toJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INTER_CONNECTION_FAILED.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INTER_CONNECTION_FAILED.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    @Test
-    void Should_ReturnInternalServerError_When_UpdateStudentIsFailed() throws Exception {
-        UpdateStudentRequestDto updateStudentRequestDto = getSampleUpdateStudentRequestDto();
-        doThrow(new StudentException("ERROR")).when(studentService).updateStudent(any(UpdateStudentRequestDto.class), anyString());
-        mockMvc.perform(MockMvcRequestBuilders.put(STUDENT_BASE_URL)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .content(updateStudentRequestDto.toJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
 
     @Test
     void Should_ReturnOk_When_StudentIsDeletedSuccessfully() throws Exception {
@@ -374,38 +199,9 @@ class StudentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message").value(SuccessResponseStatus.STUDENT_DELETED.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(SuccessResponseStatus.STUDENT_DELETED.getStatusCode()))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.data", nullValue()));
     }
-
-    @Test
-    void Should_ReturnBadRequest_When_InvalidStudentIdIsProvidedForDeleteStudent() throws Exception {
-        doThrow(new InvalidStudentException("ERROR")).when(studentService).deleteStudent(STUDENT_ID);
-        String url = STUDENT_BY_ID_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
-        mockMvc.perform(MockMvcRequestBuilders.delete(url)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_STUDENT.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_STUDENT.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
-    @Test
-    void Should_ReturnBadRequest_When_DeleteStudentIsFailed() throws Exception {
-        doThrow(new StudentException("ERROR")).when(studentService).deleteStudent(STUDENT_ID);
-        String url = STUDENT_BY_ID_URL.replace(REPLACE_STUDENT_ID, STUDENT_ID);
-        mockMvc.perform(MockMvcRequestBuilders.delete(url)
-                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getMessage()))
-                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getStatusCode()))
-                .andExpect(jsonPath("$.data", nullValue()));
-    }
-
 
     /**
      * This method creates sample student

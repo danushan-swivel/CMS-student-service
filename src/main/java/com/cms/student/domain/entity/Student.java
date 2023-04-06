@@ -22,17 +22,24 @@ import java.util.UUID;
 public class Student {
     private static final String PREFIX = "sid-";
     @Id
+    @Column(length = 50)
     private String studentId;
+    @Column(length = 50)
     private String firstName;
+    @Column(length = 50)
     private String lastName;
+    @Column(length = 100)
     private String address;
+    @Column(length = 6)
     @Enumerated(EnumType.STRING)
     private Gender gender;
     private int age;
     private int phoneNumber;
     private int grade;
+    @Column(length = 6)
     @Enumerated(EnumType.STRING)
     private StudentStatus studentStatus;
+    @Column(length = 50)
     private String tuitionClassId;
     private Date joinedDate;
     private Date updatedAt;
