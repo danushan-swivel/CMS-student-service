@@ -5,7 +5,7 @@ This is student microservice of the Class Management System
 * Open JDK 11
 * Spring boot 2.7.9
 * MySQL 8.0
-* Maven 3.6
+* Apache Maven 3.9.0
 
 
 
@@ -24,7 +24,7 @@ mvn spring-boot:run
 or
 
 ```
-java -jar target/qpon-core-service-0.0.1-SNAPSHOT.jar
+java -jar target/cms_student_service-0.0.1-SNAPSHOT.jar
 ```
 
 ## Test
