@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -68,7 +69,7 @@ public class StudentService {
             var responseWrapper = restTemplate.exchange(uri, HttpMethod.GET,
                     entity, LocationResponseWrapper.class);
             var statusCode = Objects.requireNonNull(responseWrapper.getBody()).getStatusCode();
-            if (statusCode != 2032) {
+            if (statusCode != HttpStatus.OK.value()) {
                 throw new InvalidLocationException(INVALID_TUITION_CLASS_EXCEPTION_MESSAGE
                         + studentRequestDto.getTuitionClassId());
             }
@@ -76,6 +77,10 @@ public class StudentService {
         } catch (ResourceAccessException e) {
             throw new ConnectionException("Can not access the resources from other services", e);
         } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() == HttpStatus.BAD_REQUEST.value()) {
+                throw new InvalidLocationException(INVALID_TUITION_CLASS_EXCEPTION_MESSAGE
+                        + studentRequestDto.getTuitionClassId());
+            }
             throw new StudentException("Getting tuition class by id is failed", e);
         } catch (DataAccessException e) {
             throw new StudentException("Saving student into database is failed", e);
@@ -135,7 +140,7 @@ public class StudentService {
             var responseWrapper = restTemplate.exchange(uri, HttpMethod.GET,
                     entity, LocationResponseWrapper.class);
             var statusCode = Objects.requireNonNull(responseWrapper.getBody()).getStatusCode();
-            if (statusCode != 2032) {
+            if (statusCode != HttpStatus.OK.value()) {
                 throw new InvalidLocationException(INVALID_TUITION_CLASS_EXCEPTION_MESSAGE
                         + updateStudentRequestDto.getTuitionClassId());
             }
@@ -145,6 +150,10 @@ public class StudentService {
         } catch (ResourceAccessException e) {
             throw new ConnectionException("Can not access the resources from other services", e);
         } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() == HttpStatus.BAD_REQUEST.value()) {
+                throw new InvalidLocationException(INVALID_TUITION_CLASS_EXCEPTION_MESSAGE
+                        + updateStudentRequestDto.getTuitionClassId());
+            }
             throw new StudentException("Getting tuition class by id is failed", e);
         } catch (DataAccessException e) {
             throw new StudentException("Updating student to database is failed", e);
