@@ -4,13 +4,18 @@ server:
     context-path: /student
 
 spring:
+  main:
+    allow-circular-references: true
   application:
     name: CMS-Student-Service
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
   datasource:
-    url: jdbc:mysql://b07da724040dd7:94fcc9f7@us-cdbr-east-06.cleardb.net/heroku_1e995eee500727d?reconnect=true
-#    username: root
-#    password: Dev@#$123
+    url: jdbc:mysql://localhost:3306/cms_student
+    username: root
+    password: Dev@#$123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -21,7 +26,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: https://cms-discovery.herokuapp.com/eureka
+      defaultZone: http://localhost:8761/eureka
   instance:
     preferIpAddress: true
 
@@ -29,8 +34,7 @@ eureka:
 
 location:
   uri:
-#    baseUrl: http://localhost:8105
-    baseUrl: https://cms-tuition-class.herokuapp.com
+    baseUrl: http://localhost:8105
     getLocationById: /tuition/api/v1/tuition/##LOCATION-ID##
 
 security:
