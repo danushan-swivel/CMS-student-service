@@ -13,8 +13,8 @@ spring:
       matching-strategy: ant_path_matcher
 
   datasource:
-    url: jdbc:mysql://localhost:3306/cms_student
-    username: root
+    url: jdbc:mysql://3.110.86.149:3306/cms_student
+    username: user
     password: Dev@#$123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
@@ -26,7 +26,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://ec2-43-205-126-10.ap-south-1.compute.amazonaws.com:8761/eureka
   instance:
     preferIpAddress: true
 
@@ -34,7 +34,7 @@ eureka:
 
 location:
   uri:
-    baseUrl: http://localhost:8105
+    baseUrl: http://3.110.157.4:8105
     getLocationById: /tuition/api/v1/tuition/##LOCATION-ID##
 
 security:
