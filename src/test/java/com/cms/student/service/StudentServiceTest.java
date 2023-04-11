@@ -135,7 +135,7 @@ class StudentServiceTest {
                 eq(LocationResponseWrapper.class))).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
         StudentException exception = assertThrows(StudentException.class, () ->
                 studentService.createStudent(studentRequestDto, ACCESS_TOKEN));
-        assertEquals("Getting tuition class by id is failed", exception.getMessage());
+        assertEquals("The selected location id not exists. Id : " + TUITION_CLASS_ID, exception.getMessage());
     }
 
     @Test
@@ -276,7 +276,7 @@ class StudentServiceTest {
                 eq(LocationResponseWrapper.class))).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
         StudentException exception = assertThrows(StudentException.class, () ->
                 studentService.updateStudent(updateStudentRequestDto, ACCESS_TOKEN));
-        assertEquals("Getting tuition class by id is failed", exception.getMessage());
+        assertEquals("The selected location id not exists. Id : " + TUITION_CLASS_ID, exception.getMessage());
     }
 
     @Test
@@ -396,7 +396,7 @@ class StudentServiceTest {
         LocationResponseDto locationResponseDto = getSampleLocationResponseDto();
         LocationResponseWrapper locationResponseWrapper = new LocationResponseWrapper();
         locationResponseWrapper.setData(locationResponseDto);
-        locationResponseWrapper.setStatusCode(2032);
+        locationResponseWrapper.setStatusCode(HttpStatus.OK.value());
         locationResponseWrapper.setMessage("Location retrieved successfully");
         return locationResponseWrapper;
     }
