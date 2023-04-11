@@ -74,7 +74,7 @@ class StudentControllerTest {
                         .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
                         .content(studentRequestDto.toJson())
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.message").value(SuccessResponseStatus.STUDENT_CREATED.getMessage()))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.CREATED.value()))
