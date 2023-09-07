@@ -49,6 +49,11 @@
 			<version>3.0.0</version>
 		</dependency>
 		<dependency>
+			<groupId>org.sonarsource.scanner.maven</groupId>
+			<artifactId>sonar-maven-plugin</artifactId>
+			<version>3.2</version>
+		</dependency>
+		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
 			<version>3.0.0</version>
@@ -114,12 +119,21 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-		                <groupId>org.sonarsource.scanner.maven</groupId>
-		                <artifactId>sonar-maven-plugin</artifactId>
-		                <version>3.4.0.905</version>
-		        </plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>sonar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<!-- Optional URL to server. Default value is http://localhost:9000 -->
+				<sonar.host.url>
+					http://192.168.8.102:9000
+				</sonar.host.url>
+			</properties>
+		</profile>
+	</profiles>
 
 </project>
