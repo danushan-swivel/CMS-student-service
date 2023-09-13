@@ -94,7 +94,7 @@ public class StudentController extends BaseController {
         return getSuccessResponse(SuccessResponseStatus.STUDENT_DELETED, null, HttpStatus.OK);
     }
 
-    @GetMapping("")
+    @GetMapping("/sample")
     public String sample() {
         return "sample";
     }
