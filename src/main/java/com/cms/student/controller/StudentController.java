@@ -93,4 +93,9 @@ public class StudentController extends BaseController {
         log.debug("The student is deleted successfully for student id: {}", studentId);
         return getSuccessResponse(SuccessResponseStatus.STUDENT_DELETED, null, HttpStatus.OK);
     }
+
+    @GetMapping("")
+    public String sample() {
+        return "sample";
+    }
 }
